@@ -553,14 +553,10 @@ struct hb_buffer_t
     if (!messaging ())
       return true;
 
-    message_depth++;
-
     va_list ap;
     va_start (ap, fmt);
     bool ret = message_impl (font, fmt, ap);
     va_end (ap);
-
-    message_depth--;
 
     return ret;
 #endif
