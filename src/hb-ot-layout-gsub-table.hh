@@ -88,6 +88,16 @@ struct SingleSubstFormat1
     /* According to the Adobe Annotated OpenType Suite, result is always
      * limited to 16bit. */
     glyph_id = (glyph_id + deltaGlyphID) & 0xFFFFu;
+
+    if (unlikely (c->buffer->messaging ()))
+    {
+      c->buffer->sync_so_far ();
+      c->buffer->message (c->font,
+			  "replacing glyph at %d: gid%d -> gid%d",
+			  c->buffer->idx,
+			  c->buffer->cur().codepoint,
+			  glyph_id);
+    }
     c->replace_glyph (glyph_id);
 
     return_trace (true);
