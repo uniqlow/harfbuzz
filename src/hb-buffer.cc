@@ -385,9 +385,11 @@ hb_buffer_t::clear_positions ()
   hb_memset (pos, 0, sizeof (pos[0]) * len);
 }
 
-void
+bool
 hb_buffer_t::sync ()
 {
+  bool ret = false;
+
   assert (have_output);
 
   assert (idx <= len);
@@ -401,12 +403,36 @@ hb_buffer_t::sync ()
     info = out_info;
   }
   len = out_len;
+  ret = true;
 
 reset:
   have_output = false;
   out_info = info;
   out_len = 0;
   idx = 0;
+
+  return ret;
+}
+
+void
+hb_buffer_t::sync_so_far ()
+{
+  bool had_output = have_output;
+  unsigned out_i = out_len;
+  unsigned i = idx;
+
+  if (sync ())
+    idx = out_i;
+  else
+    idx = i;
+
+  if (had_output)
+  {
+    have_output = true;
+    out_len = idx;
+  }
+
+  assert (idx <= len);
 }
 
 bool
